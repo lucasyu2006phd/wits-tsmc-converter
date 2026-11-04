@@ -210,6 +210,8 @@ with tab2:
             try:
                 df = pd.read_excel(ex_file, header=None)
                 name = str(df.iloc[1, 8]).strip()
+                if name == 'nan' or name == '':
+                name = str(df.iloc[2, 8]).strip()
                 df_data = df.iloc[5:].dropna(subset=[1])
                 actual = pd.to_numeric(df_data[7], errors='coerce').sum()
                 leave = pd.to_numeric(df_data[5], errors='coerce').sum()

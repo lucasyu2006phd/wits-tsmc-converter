@@ -75,9 +75,12 @@ with tab1:
             for i, wits_file in enumerate(wits_files):
                 try:
                     add_log(f"正在處理檔案：{wits_file.name}")
-                    df_wits_raw = pd.read_excel(wits_file, header=None)
-                    employee_name = str(df_wits_raw.iloc[1, 8]).strip()
-                    add_log(f"萃取到姓名：{employee_name}")
+                   df_wits_raw = pd.read_excel(wits_file, header=None)
+                   # 自動尋找姓名：如果第2列是空的，就找第3列
+                   employee_name = str(df_wits_raw.iloc[1, 8]).strip()
+                  if employee_name == 'nan' or employee_name == '':
+                     employee_name = str(df_wits_raw.iloc[2, 8]).strip()
+                  add_log(f"萃取到姓名：{employee_name}")
                     
                     # 嘗試比對
                     try:

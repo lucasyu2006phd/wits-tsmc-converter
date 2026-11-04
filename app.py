@@ -21,16 +21,14 @@ def add_log(message, level="INFO"):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     log_entry = f"[{timestamp}] [{level}] {message}"
     st.session_state.logs.append(log_entry)
-    print(log_entry) # 同時輸出到終端機
+    print(log_entry)
 
 # 顯示 Log 區塊
 with st.expander("🛠️ 系統執行日誌 (展開查看 Debug 資訊)"):
     if st.button("🗑️ 清除日誌"):
         st.session_state.logs = []
-    
     log_text = "\n".join(st.session_state.logs)
     st.text_area("Logs", value=log_text, height=150, disabled=True, label_visibility="collapsed")
-
 
 tab1, tab2, tab3 = st.tabs([
     "🔄 3-1. WITS 轉 TSMC", 
@@ -75,14 +73,15 @@ with tab1:
             for i, wits_file in enumerate(wits_files):
                 try:
                     add_log(f"正在處理檔案：{wits_file.name}")
-                   df_wits_raw = pd.read_excel(wits_file, header=None)
-                   # 自動尋找姓名：如果第2列是空的，就找第3列
-                   employee_name = str(df_wits_raw.iloc[1, 8]).strip()
-                  if employee_name == 'nan' or employee_name == '':
-                     employee_name = str(df_wits_raw.iloc[2, 8]).strip()
-                  add_log(f"萃取到姓名：{employee_name}")
+                    df_wits_raw = pd.read_excel(wits_file, header=None)
                     
-                    # 嘗試比對
+                    # 自動尋找姓名：如果第2列是空的，就找第3列
+                    employee_name = str(df_wits_raw.iloc[1, 8]).strip()
+                    if employee_name == 'nan' or employee_name == '':
+                        employee_name = str(df_wits_raw.iloc[2, 8]).strip()
+                        
+                    add_log(f"萃取到姓名：{employee_name}")
+                    
                     try:
                         match = df_mapping[df_mapping['姓名'] == employee_name]
                         if match.empty:
@@ -210,8 +209,6 @@ with tab2:
             try:
                 df = pd.read_excel(ex_file, header=None)
                 name = str(df.iloc[1, 8]).strip()
-                if name == 'nan' or name == '':
-                name = str(df.iloc[2, 8]).strip()
                 df_data = df.iloc[5:].dropna(subset=[1])
                 actual = pd.to_numeric(df_data[7], errors='coerce').sum()
                 leave = pd.to_numeric(df_data[5], errors='coerce').sum()
@@ -268,7 +265,12 @@ with tab3:
         for file in summary_files:
             try:
                 df = pd.read_excel(file, header=None)
+                
+                # 自動尋找姓名：如果第2列是空的，就找第3列
                 name = str(df.iloc[1, 8]).strip()
+                if name == 'nan' or name == '':
+                    name = str(df.iloc[2, 8]).strip()
+                    
                 df_data = df.iloc[5:].dropna(subset=[1])
                 total_actual = pd.to_numeric(df_data[7], errors='coerce').sum()
                 total_leave = pd.to_numeric(df_data[5], errors='coerce').sum()
